@@ -33,7 +33,7 @@ async function init() {
   renderCategories();
   // Initial render
   renderEntries(allEntries);
-  
+
   // Search functionality
   search.addEventListener("input", (e) => {
     const term = e.target.value.toLowerCase();
@@ -134,7 +134,6 @@ async function init() {
       });
     });
   }
-  
 }
 
 async function summarizeText(text) {

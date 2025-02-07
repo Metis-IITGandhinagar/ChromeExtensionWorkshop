@@ -1,22 +1,22 @@
 {
-	"name": "Library Extension by Metis",
-	"manifest_version": 3,
-	"version": "0.1.0",
+  "name": "Library Extension by Metis",
+  "manifest_version": 3,
+  "version": "0.1.0",
 
-	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting", "https://api.groq.com/"],
-	"side_panel": {
-		"default_path": "popup.html"
-	},
-	"action": { "default_title": "Generate a summary" },
-	"background": {
-		"service_worker": "background.js",
-		"type": "module"
-	},
-	"host_permissions": ["<all_urls>"],
-	"web_accessible_resources": [
-		{
-			"resources": ["dialog.html"],
-			"matches": ["<all_urls>"]
-		}
-	]
+  "permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting", "https://api.groq.com/"],
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "action": { "default_title": "Generate a summary" },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["dialog.html", "style.css", "popup.html", "popup.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
