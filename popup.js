@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", init);
 
+const GROQ_API_KEY = "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"; // Replace with actual key
+const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+
 async function init() {
   const search = document.getElementById("search");
   const entriesContainer = document.getElementById("entries");
@@ -60,46 +63,101 @@ async function init() {
     entriesContainer.innerHTML = entries
       .map(
         (entry) => `
-      <div class="entry-card">
-        <div class="header">
-          <h3>${entry.title}</h3>
-          <span class="category-tag">${entry.category}</span>
+    <div class="entry-card">
+      <div class="header">
+        <h3>${entry.title}</h3>
+        <span class="category-tag">${entry.category}</span>
+      </div>
+      <p class="content">${entry.text}</p>
+      ${
+        entry.summary
+          ? `
+        <div class="summary">
+          <strong>Summary:</strong>
+          <p>${entry.summary}</p>
         </div>
-        <p class="content">${entry.text}</p>
-        <div class="footer">
-          <a href="${entry.url}" target="_blank" class="url">View Source</a>
+      `
+          : ""
+      }
+      <div class="footer">
+        <a href="${entry.url}" target="_blank" class="url">View Source</a>
+        <div class="actions">
           <span class="time">${new Date(entry.timestamp).toLocaleString()}</span>
+          ${
+            !entry.summary
+              ? `
+            <button class="summarize-btn" data-timestamp="${entry.timestamp}">
+              Summarize
+            </button>
+          `
+              : ""
+          }
         </div>
       </div>
-    `
+    </div>
+  `
       )
       .join("");
-  }
-  
-  document.addEventListener("DOMContentLoaded", async () => {
-    // Check if service worker is ready
-    if (!chrome.runtime?.id) {
-      console.error("Extension context invalidated!");
-      return;
-    }
 
-    // Add retry logic for service worker
-    const maxRetries = 3;
-    let retries = 0;
+    // Add summarize handlers
+    document.querySelectorAll(".summarize-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const timestamp = Number(e.target.dataset.timestamp);
+        const entry = allEntries.find((entry) => entry.timestamp === timestamp);
 
-    async function initialize() {
-      try {
-        await chrome.runtime.sendMessage({ type: "keepAlive" });
-        init();
-      } catch (error) {
-        if (retries++ < maxRetries) {
-          setTimeout(initialize, 100 * retries);
-        } else {
-          console.error("Failed to initialize service worker:", error);
+        e.target.textContent = "Summarizing...";
+        e.target.disabled = true;
+
+        const summary = await summarizeText(entry.text);
+
+        if (summary) {
+          const updatedEntry = { ...entry, summary };
+          await updateEntry(updatedEntry);
         }
-      }
-    }
 
-    initialize();
-  });
+        e.target.textContent = "Summarize";
+        e.target.disabled = false;
+      });
+    });
+  }
+}
+
+async function summarizeText(text) {
+  try {
+    const response = await fetch(GROQ_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "mixtral-8x7b-32768",
+        messages: [
+          {
+            role: "user",
+            content: `Summarize this text while maintaining key information. Keep it concise and under 100 words. Text: ${text}`,
+          },
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("Summarization failed:", error);
+    return null;
+  }
+}
+
+async function updateEntry(updatedEntry) {
+  const { entries } = await chrome.storage.local.get({ entries: [] });
+  const updatedEntries = entries.map((entry) => (entry.timestamp === updatedEntry.timestamp ? updatedEntry : entry));
+  await chrome.storage.local.set({ entries: updatedEntries });
+  allEntries = updatedEntries;
+
+  // Re-render with current filters
+  const term = search.value.toLowerCase();
+  const filteredEntries = filterEntries(term, currentCategory);
+  renderEntries(filteredEntries);
 }

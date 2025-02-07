@@ -3,7 +3,7 @@
 	"manifest_version": 3,
 	"version": "0.1.0",
 
-	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting"],
+	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting", "https://api.groq.com/"],
 	"side_panel": {
 		"default_path": "popup.html"
 	},
