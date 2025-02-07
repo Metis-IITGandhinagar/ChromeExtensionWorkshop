@@ -6,5 +6,12 @@ import { crx } from "@crxjs/vite-plugin";
 import manifest from "./manifest.json" assert { type: "json" };
 
 export default defineConfig({
+	build: {
+		rollupOptions: {
+			input: {
+				sidepanel: "sidepanel/index.html",
+			},
+		},
+	},
 	plugins: [crx({ manifest })],
 });
