@@ -1,46 +1,52 @@
+// Initialize the application after the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", init);
 
-const GROQ_API_KEY = "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"; // Replace with actual key
+// Replace with your actual Groq API key
+const GROQ_API_KEY = "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"; 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
+// Asynchronous initialization function
 async function init() {
+  // Get references to DOM elements
   const search = document.getElementById("search");
   const entriesContainer = document.getElementById("entries");
   const categoriesContainer = document.getElementById("categories");
 
+  // Initialize variables to store entries and the currently selected category
   let allEntries = [];
   let currentCategory = "all";
 
-  // Load entries
+  // Load saved entries from Chrome storage
   const { entries } = await chrome.storage.local.get({ entries: [] });
   allEntries = entries;
 
-  // Add updateEntry inside init scope
+  // Function to update a single entry in Chrome storage and re-render
   const updateEntry = async (updatedEntry) => {
     const { entries } = await chrome.storage.local.get({ entries: [] });
     const updatedEntries = entries.map((entry) => (entry.timestamp === updatedEntry.timestamp ? updatedEntry : entry));
     await chrome.storage.local.set({ entries: updatedEntries });
     allEntries = updatedEntries;
 
-    // Use the existing filter values
+    // Re-filter and re-render entries based on current search term and category
     const term = search.value.toLowerCase();
     const filteredEntries = filterEntries(term, currentCategory);
     renderEntries(filteredEntries);
-    renderCategories(); // Update categories in case category changed
+    renderCategories(); // Update categories if needed
   };
 
-  // Render categories
+  // Render categories initially
   renderCategories();
-  // Initial render
+  // Render entries initially
   renderEntries(allEntries);
 
-  // Search functionality
+  // Add event listener for search input changes
   search.addEventListener("input", (e) => {
     const term = e.target.value.toLowerCase();
     const filtered = filterEntries(term, currentCategory);
     renderEntries(filtered);
   });
 
+  // Function to filter entries based on search term and category
   function filterEntries(term, category) {
     return allEntries.filter((entry) => {
       const matchesText = entry.text.toLowerCase().includes(term) || entry.title.toLowerCase().includes(term);
@@ -49,6 +55,7 @@ async function init() {
     });
   }
 
+  // Function to render category buttons
   function renderCategories() {
     const categories = ["all", ...new Set(allEntries.map((e) => e.category))];
     categoriesContainer.innerHTML = categories
@@ -62,6 +69,7 @@ async function init() {
       )
       .join("");
 
+    // Add event listener for category button clicks
     categoriesContainer.addEventListener("click", (e) => {
       if (e.target.classList.contains("category")) {
         currentCategory = e.target.dataset.cat;
@@ -73,6 +81,7 @@ async function init() {
     });
   }
 
+  // Function to render entries
   function renderEntries(entries) {
     entriesContainer.innerHTML = entries
       .map(
@@ -113,7 +122,7 @@ async function init() {
       )
       .join("");
 
-    // Add summarize handlers
+    // Add event listeners for summarize buttons
     document.querySelectorAll(".summarize-btn").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         const timestamp = Number(e.target.dataset.timestamp);
@@ -136,6 +145,7 @@ async function init() {
   }
 }
 
+// Asynchronous function to summarize text using the Groq API
 async function summarizeText(text) {
   try {
     const response = await fetch(GROQ_ENDPOINT, {
