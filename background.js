@@ -1,3 +1,8 @@
+// for side panel
+chrome.sidePanel
+	.setPanelBehavior({ openPanelOnActionClick: true })
+	.catch(error => console.error(error));
+
 // Updated background.js
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({

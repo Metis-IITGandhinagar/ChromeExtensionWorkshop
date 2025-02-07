@@ -1,32 +1,23 @@
 {
-  "manifest_version": 3,
-  "name": "Text Saver",
-  "version": "1.0",
-  "permissions": ["contextMenus", "storage", "activeTab", "scripting"],
-  "action": {
-    "default_popup": "popup.html"
-  },
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-  "host_permissions": ["<all_urls>"],
-  "web_accessible_resources": [
-    {
-      "resources": ["dialog.html"],
-      "matches": ["<all_urls>"]
-    }
-  ]
 	"name": "Library Extension by Metis",
-	"version": "0.1.0",
 	"manifest_version": 3,
-	"background": {
-		"service_worker": "background.js"
-	},
-	"permissions": ["tabs", "scripting", "sidePanel", "storage"],
+	"version": "0.1.0",
+
+	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting"],
 	"host_permissions": ["http://*/*", "https://*/*"],
 	"side_panel": {
 		"default_path": "sidepanel/index.html"
 	},
-	"action": { "default_title": "Generate a summary" }
+	"action": { "default_title": "Generate a summary" },
+	"background": {
+		"service_worker": "background.js",
+		"type": "module"
+	},
+	"host_permissions": ["<all_urls>"],
+	"web_accessible_resources": [
+		{
+			"resources": ["dialog.html"],
+			"matches": ["<all_urls>"]
+		}
+	]
 }
