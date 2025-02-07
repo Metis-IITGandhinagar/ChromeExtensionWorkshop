@@ -15,6 +15,20 @@ async function init() {
   const { entries } = await chrome.storage.local.get({ entries: [] });
   allEntries = entries;
 
+  // Add updateEntry inside init scope
+  const updateEntry = async (updatedEntry) => {
+    const { entries } = await chrome.storage.local.get({ entries: [] });
+    const updatedEntries = entries.map((entry) => (entry.timestamp === updatedEntry.timestamp ? updatedEntry : entry));
+    await chrome.storage.local.set({ entries: updatedEntries });
+    allEntries = updatedEntries;
+
+    // Use the existing filter values
+    const term = search.value.toLowerCase();
+    const filteredEntries = filterEntries(term, currentCategory);
+    renderEntries(filteredEntries);
+    renderCategories(); // Update categories in case category changed
+  };
+
   // Render categories
   renderCategories();
   // Initial render
@@ -120,6 +134,7 @@ async function init() {
       });
     });
   }
+  
 }
 
 async function summarizeText(text) {
@@ -148,16 +163,4 @@ async function summarizeText(text) {
     console.error("Summarization failed:", error);
     return null;
   }
-}
-
-async function updateEntry(updatedEntry) {
-  const { entries } = await chrome.storage.local.get({ entries: [] });
-  const updatedEntries = entries.map((entry) => (entry.timestamp === updatedEntry.timestamp ? updatedEntry : entry));
-  await chrome.storage.local.set({ entries: updatedEntries });
-  allEntries = updatedEntries;
-
-  // Re-render with current filters
-  const term = search.value.toLowerCase();
-  const filteredEntries = filterEntries(term, currentCategory);
-  renderEntries(filteredEntries);
 }
