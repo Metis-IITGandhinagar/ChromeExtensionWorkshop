@@ -5,7 +5,7 @@
 
 	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting", "https://api.groq.com/"],
 	"side_panel": {
-		"default_path": "popup.html"
+		"default_path": "sidebar/sidebar.html"
 	},
 	"action": { "default_title": "Generate a summary" },
 	"background": {
@@ -15,7 +15,7 @@
 	"host_permissions": ["<all_urls>"],
 	"web_accessible_resources": [
 		{
-			"resources": ["dialog.html", "dialog.js", "style.css", "popup.html", "popup.js", "sw-loader.js"],
+			"resources": ["dialog/dialog.html", "dialog/dialog.js", "style.css", "sidebar/sidebar.html", "sidebar/sidebar.js", "sw-loader.js"],
 			"matches": ["<all_urls>"]
 		}
 	]

@@ -7,7 +7,7 @@ chrome.sidePanel
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({
 		id: "saveText",
-		title: "Save Text",
+		title: "Save Text to Your Library",
 		contexts: ["selection"],
 	});
 });
@@ -26,7 +26,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 			// Use chrome.windows.create instead of prompt
 			chrome.windows.create(
 				{
-					url: chrome.runtime.getURL("dialog.html"),
+					url: chrome.runtime.getURL("dialog/dialog.html"),
 					type: "popup",
 					width: 400,
 					height: 300,
