@@ -1,6 +1,6 @@
 {
-  "manifest_version": 3,
-  "name": "CRXJS React Vite Example",
-  "version": "1.0.0",
-  "action": { "default_popup": "index.html" }
+	"manifest_version": 3,
+	"name": "Library Extension by Metis",
+	"version": "0.1.0",
+	"action": { "default_popup": "index.html" }
 }
