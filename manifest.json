@@ -4,9 +4,8 @@
 	"version": "0.1.0",
 
 	"permissions": ["contextMenus", "storage", "activeTab", "tabs", "sidePanel", "scripting"],
-	"host_permissions": ["http://*/*", "https://*/*"],
 	"side_panel": {
-		"default_path": "sidepanel/index.html"
+		"default_path": "popup.html"
 	},
 	"action": { "default_title": "Generate a summary" },
 	"background": {
