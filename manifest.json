@@ -15,7 +15,7 @@
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["dialog.html", "style.css", "popup.html", "popup.js"],
+      "resources": ["dialog.html", "style.css", "popup.html", "popup.js", "dialog.js", "sw-loader.js"],
       "matches": ["<all_urls>"]
     }
   ]
