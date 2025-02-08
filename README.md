@@ -2,7 +2,7 @@
 
 This repository contains sample code for building a Chrome extension that saves text from any website and provides AI generated summaries for later reference.
 
-This extension is built using crx.js which helps building Chrome extensions using modern web technologies like React, TypeScript, and Webpack. Features like hot reloading, TypeScript support, and more are included out of the box. This repository however sticks with the basics to provide a simple example.  
+This extension is built using crx.js which helps building Chrome extensions using modern web technologies like React, TypeScript, and Webpack. Features like hot reloading, TypeScript support, and more are included out of the box. This repository however sticks with the basics to provide a simple example.
 
 It uses the Chrome Storage API to save text data and the Groq API to generate summaries.
 
@@ -12,6 +12,26 @@ It uses the Chrome Storage API to save text data and the Groq API to generate su
 2. Run `npm install` to install dependencies.
 3. Run `npm run build` to build the extension.
 4. Load the extension in Chrome by going to `chrome://extensions/`, enabling Developer mode, and loading the `dist` directory.
+
+## For making your own extension
+
+- **VanillaJS**:
+  ```
+      npm init vite@^2
+      npm i @crxjs/vite-plugin -D
+  ```
+  Then make a `vite.config.js` with
+  ```javascript
+  import { defineConfig } from "vite";
+  import { crx } from "@crxjs/vite-plugin";
+  import manifest from "./manifest.json";
+
+  export default defineConfig({
+  	plugins: [crx({ manifest })],
+  });
+  ```
+  Then make a manifest.json file. Done!
+- **[Using react](https://dev.to/jacksteamdev/create-a-vite-react-chrome-extension-in-90-seconds-3df7)**
 
 # General Chrome Extension Knowledge
 
@@ -48,6 +68,7 @@ Extensions are made up of a background script, content scripts, an options page,
 A script that runs in the background, separate from the main browser thread. They are event-driven and can intercept network requests, cache resources, and more. These can run in the background even when the extension is not active.
 
 #### Usage
+
 ```javascript
 // Register service worker
 navigator.serviceWorker.register('service-worker.js');
@@ -113,15 +134,15 @@ Example: One time messages - Popup -> Background Script
 
 ```javascript
 // popup.js (Sender)
-chrome.runtime.sendMessage({ action: 'getData' }, (response) => {
-  console.log('Received response:', response);
+chrome.runtime.sendMessage({ action: "getData" }, response => {
+	console.log("Received response:", response);
 });
 
 // background.js (Receiver)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'getData') {
-    sendResponse({ data: 'Hello from background!' });
-  }
+	if (message.action === "getData") {
+		sendResponse({ data: "Hello from background!" });
+	}
 });
 ```
 
@@ -129,22 +150,22 @@ Example: Long-lived connection - Popup <-> Background Script
 
 ```javascript
 // content-script.js (Sender)
-const port = chrome.runtime.connect({ name: 'content-script' });
-port.postMessage({ action: 'start' });
+const port = chrome.runtime.connect({ name: "content-script" });
+port.postMessage({ action: "start" });
 
-port.onMessage.addListener((message) => {
-  console.log('Received:', message);
+port.onMessage.addListener(message => {
+	console.log("Received:", message);
 });
 
 // background.js (Receiver)
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === 'content-script') {
-    port.onMessage.addListener((message) => {
-      if (message.action === 'start') {
-        port.postMessage({ status: 'connected' });
-      }
-    });
-  }
+chrome.runtime.onConnect.addListener(port => {
+	if (port.name === "content-script") {
+		port.onMessage.addListener(message => {
+			if (message.action === "start") {
+				port.postMessage({ status: "connected" });
+			}
+		});
+	}
 });
 ```
 
@@ -152,13 +173,13 @@ Example: Cross-origin communication - Web Page <-> Content Script
 
 ```javascript
 // web-page.js (Sender)
-window.postMessage({ type: 'FROM_PAGE', data: 'Hello from page!' }, '*');
+window.postMessage({ type: "FROM_PAGE", data: "Hello from page!" }, "*");
 
 // content-script.js (Receiver)
-window.addEventListener('message', (event) => {
-  if (event.data.type === 'FROM_PAGE') {
-    console.log('Received from page:', event.data.data);
-  }
+window.addEventListener("message", event => {
+	if (event.data.type === "FROM_PAGE") {
+		console.log("Received from page:", event.data.data);
+	}
 });
 ```
 
@@ -170,8 +191,8 @@ Example:
 
 ```javascript
 // content-script.js
-document.body.style.backgroundColor = 'yellow';
-chrome.runtime.sendMessage({ action: 'pageModified' });
+document.body.style.backgroundColor = "yellow";
+chrome.runtime.sendMessage({ action: "pageModified" });
 ```
 
 ### Permissions
@@ -194,15 +215,15 @@ It manages extension lifecycle and cross-component communication. Extension life
 
 ```javascript
 // From popup.js
-chrome.runtime.sendMessage({action: "saveData", data: entry});
+chrome.runtime.sendMessage({ action: "saveData", data: entry });
 
 // In background.js
-chrome.runtime.onMessage.addListener((message) => {
-  if(message.action === "saveData") {
-    // Handle data
-    const data = message.data;
-    // ...
-  }
+chrome.runtime.onMessage.addListener(message => {
+	if (message.action === "saveData") {
+		// Handle data
+		const data = message.data;
+		// ...
+	}
 });
 ```
 
@@ -216,25 +237,24 @@ It requires permissions to access - `"scripting"`, `"activeTab"`.
 
 ```javascript
 chrome.scripting.executeScript({
-  target: {tabId: tab.id},
-  files: ['content-script.js']
+	target: { tabId: tab.id },
+	files: ["content-script.js"],
 });
 
 // Execute ad-hoc code
 chrome.scripting.executeScript({
-  target: {tabId: tab.id},
-  func: () => {
-    document.body.style.backgroundColor = 'red';
-  }
+	target: { tabId: tab.id },
+	func: () => {
+		document.body.style.backgroundColor = "red";
+	},
 });
-
 ```
 
 Example of content-script.js:
 
 ```javascript
 const text = document.body.innerText;
-chrome.storage.local.set({text: text});
+chrome.storage.local.set({ text: text });
 ```
 
 ### Alarms: chrome.alarms
@@ -246,15 +266,15 @@ It requires permissions to access - `"alarms"`.
 #### Scheduling an Alarm
 
 ```javascript
-chrome.alarms.create('refreshData', {
-  periodInMinutes: 60
+chrome.alarms.create("refreshData", {
+	periodInMinutes: 60,
 });
 
 // Handle alarms in background.js
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if(alarm.name === 'refreshData') {
-    fetchNewData();
-  }
+chrome.alarms.onAlarm.addListener(alarm => {
+	if (alarm.name === "refreshData") {
+		fetchNewData();
+	}
 });
 ```
 
@@ -268,15 +288,15 @@ It requires permissions to access - `"tabs"`.
 
 ```javascript
 // Create new tab
-chrome.tabs.create({url: 'https://example.com'});
+chrome.tabs.create({ url: "https://example.com" });
 
 // Get current tab
-chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-  const currentTab = tabs[0];
+chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+	const currentTab = tabs[0];
 });
 
 // Update tab URL
-chrome.tabs.update(tabId, {url: newUrl});
+chrome.tabs.update(tabId, { url: newUrl });
 ```
 
 ### Storage: chrome.storage
@@ -296,15 +316,15 @@ It requires permissions to access - `"storage"`.
 
 ```javascript
 // Save data
-chrome.storage.local.set({key: value});
+chrome.storage.local.set({ key: value });
 
 // Retrieve data
-chrome.storage.local.get(['key'], (result) => {
-  console.log(result.key);
+chrome.storage.local.get(["key"], result => {
+	console.log(result.key);
 });
 
 // Sync across devices
-chrome.storage.sync.set({preferences: {darkMode: true}});
+chrome.storage.sync.set({ preferences: { darkMode: true } });
 ```
 
 ### Notifications: chrome.notifications
@@ -316,16 +336,16 @@ It requires permissions to access - `"notifications"`.
 #### Usage
 
 ```javascript
-chrome.notifications.create('notificationId', {
-  type: 'basic',
-  iconUrl: 'icon.png',
-  title: 'Title',
-  message: 'Message'
+chrome.notifications.create("notificationId", {
+	type: "basic",
+	iconUrl: "icon.png",
+	title: "Title",
+	message: "Message",
 });
 
 // Handle notification click
-chrome.notifications.onClicked.addListener((notificationId) => {
-  console.log('Notification clicked');
+chrome.notifications.onClicked.addListener(notificationId => {
+	console.log("Notification clicked");
 });
 ```
 
@@ -338,10 +358,10 @@ It requires permissions to access - `"webNavigation"`.
 #### Usage
 
 ```javascript
-chrome.webNavigation.onCompleted.addListener((details) => {
-  if(details.url.includes('special-page')) {
-    injectSpecialContent();
-  }
+chrome.webNavigation.onCompleted.addListener(details => {
+	if (details.url.includes("special-page")) {
+		injectSpecialContent();
+	}
 });
 ```
 
@@ -378,22 +398,28 @@ It allows you to request permissions to access certain features like tabs, stora
 #### Usage
 
 ```javascript
-chrome.permissions.request({
-  origins: ['https://*.example.com/*']
-}, (granted) => {
-  if(granted) {
-    enablePremiumFeature();
-  }
-});
+chrome.permissions.request(
+	{
+		origins: ["https://*.example.com/*"],
+	},
+	granted => {
+		if (granted) {
+			enablePremiumFeature();
+		}
+	}
+);
 
 // Check if permission is granted
-chrome.permissions.contains({
-  origins: ['https://*.example.com/*']
-}, (result) => {
-  if(result) {
-    enablePremiumFeature();
-  }
-});
+chrome.permissions.contains(
+	{
+		origins: ["https://*.example.com/*"],
+	},
+	result => {
+		if (result) {
+			enablePremiumFeature();
+		}
+	}
+);
 ```
 
 ### Web Request: chrome.webRequest
@@ -407,23 +433,23 @@ It requires permissions to access - `"webRequest"`.
 ```javascript
 // Block ads
 chrome.webRequest.onBeforeRequest.addListener(
-  (details) => {
-    if(details.url.includes('adserver')) {
-      return {cancel: true}; // Block request
-    }
-  },
-  {urls: ["<all_urls>"]},
-  ["blocking"]
+	details => {
+		if (details.url.includes("adserver")) {
+			return { cancel: true }; // Block request
+		}
+	},
+	{ urls: ["<all_urls>"] },
+	["blocking"]
 );
 
 // Modify headers
 chrome.webRequest.onBeforeSendHeaders.addListener(
-  (details) => {
-    details.requestHeaders.push({name: 'X-My-Header', value: 'Value'});
-    return {requestHeaders: details.requestHeaders};
-  },
-  {urls: ["<all_urls>"]},
-  ["blocking", "requestHeaders"]
+	details => {
+		details.requestHeaders.push({ name: "X-My-Header", value: "Value" });
+		return { requestHeaders: details.requestHeaders };
+	},
+	{ urls: ["<all_urls>"] },
+	["blocking", "requestHeaders"]
 );
 ```
 
@@ -438,16 +464,16 @@ It requires permissions to access - `"contextMenus"`.
 ```javascript
 // Create context menu item
 chrome.contextMenus.create({
-  id: 'save-selection',
-  title: 'Save Selection',
-  contexts: ['selection']
+	id: "save-selection",
+	title: "Save Selection",
+	contexts: ["selection"],
 });
 
 // Handle context menu click
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if(info.menuItemId === 'save-selection') {
-    saveSelection(info.selectionText);
-  }
+	if (info.menuItemId === "save-selection") {
+		saveSelection(info.selectionText);
+	}
 });
 ```
 
@@ -461,25 +487,25 @@ It requires permissions to access - `"identity"`.
 
 ```javascript
 // Get OAuth2 token
-chrome.identity.getAuthToken({interactive: true}, (token) => {
-  fetch('https://api.example.com/data', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+chrome.identity.getAuthToken({ interactive: true }, token => {
+	fetch("https://api.example.com/data", {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
 });
 
 // Check if user is signed in
-chrome.identity.getProfileUserInfo((userInfo) => {
-  if(userInfo.id) {
-    console.log('User is signed in');
-  }
+chrome.identity.getProfileUserInfo(userInfo => {
+	if (userInfo.id) {
+		console.log("User is signed in");
+	}
 });
 
 // Sign out
-chrome.identity.removeCachedAuthToken({token: token});
+chrome.identity.removeCachedAuthToken({ token: token });
 ```
- 
+
 ### Cookies: chrome.cookies
 
 It allows you to interact with cookies in the browser. This is useful when you want to read, write, or delete cookies for a specific domain.
@@ -490,19 +516,19 @@ It requires permissions to access - `"cookies"`.
 
 ```javascript
 // Get cookies
-chrome.cookies.get({url: 'https://example.com', name: 'session'}, (cookie) => {
-  console.log(cookie.value);
+chrome.cookies.get({ url: "https://example.com", name: "session" }, cookie => {
+	console.log(cookie.value);
 });
 
 // Set cookie
 chrome.cookies.set({
-  url: 'https://example.com',
-  name: 'session',
-  value: '12345'
+	url: "https://example.com",
+	name: "session",
+	value: "12345",
 });
 
 // Delete cookie
-chrome.cookies.remove({url: 'https://example.com', name: 'session'});
+chrome.cookies.remove({ url: "https://example.com", name: "session" });
 ```
 
 ### Action: chrome.action
