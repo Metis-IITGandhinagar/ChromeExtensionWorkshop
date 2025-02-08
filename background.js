@@ -12,6 +12,16 @@ chrome.runtime.onInstalled.addListener(() => {
 	});
 });
 
+// chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+// 	if (message.type === "getCategories") {
+// 		chrome.storage.local.get({ entries: [] }, data => {
+// 			const uniqueCategories = new Set(data.entries.map(entry => entry.category));
+// 			sendResponse({ categories: [...uniqueCategories] });
+// 		});
+// 		return true; // Indicate that we will handle the response asynchronously
+// 	}
+// });
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "saveText" && info.selectionText) {
 		try {
@@ -34,7 +44,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 					top: 200,
 				},
 				async window => {
-					chrome.runtime.onMessage.addListener(function listener(message) {
+					chrome.runtime.onMessage.addListener(function listener(message, sender, sendResponse) {
+						console.log("Received message:", message);
 						if (message.type === "saveData" && message.data) {
 							const entry = {
 								title: message.data.title,
@@ -52,6 +63,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 							});
 						}
 						chrome.runtime.onMessage.removeListener(listener);
+						return true;
 					});
 				}
 			);
