@@ -13,7 +13,7 @@ It uses the Chrome Storage API to save text data and the Groq API to generate su
 3. Run `npm run build` to build the extension.
 4. Load the extension in Chrome by going to `chrome://extensions/`, enabling Developer mode, and loading the `dist` directory.
 
-## For making your own extension
+## For making your own extension with Node 
 
 - **VanillaJS**:
   ```
