@@ -27,6 +27,16 @@ async function init() {
     renderEntries(filtered);
   });
 
+  chrome.storage.onChanged.addListener(async() => {
+    const { entries } = await chrome.storage.local.get({ entries: [] });
+    allEntries = entries;
+
+    // Render categories
+    renderCategories();
+    // Initial render
+    renderEntries(allEntries);
+  })
+
   function filterEntries(term, category) {
     return allEntries.filter((entry) => {
       const matchesText = entry.text.toLowerCase().includes(term) || entry.title.toLowerCase().includes(term);
@@ -81,7 +91,7 @@ async function init() {
       }
       <div class="footer">
         <a href="${entry.url}" target="_blank" class="url">View Source</a>
-        <div class="actions">
+        <div class="actions" style="display: flex;">
           <span class="time">${new Date(entry.timestamp).toLocaleString()}</span>
           ${
             !entry.summary
@@ -92,6 +102,7 @@ async function init() {
           `
               : ""
           }
+          <button class="remove-btn" data-timestamp="${entry.timestamp}">Remove</button>
         </div>
       </div>
     </div>
@@ -119,6 +130,21 @@ async function init() {
         e.target.disabled = false;
       });
     });
+    document.querySelectorAll(".remove-btn").forEach((btn) => {
+      btn.addEventListener("click", async(e) => {
+        const timestamp = Number(e.target.dataset.timestamp);
+        const entry = allEntries.find((entry) => entry.timestamp === timestamp);
+
+        const isConfirmed = confirm(`Are you sure you want to remove the entry: ${entry.title}`);
+        if (isConfirmed) {
+          const updatedEntries = allEntries.filter((entry) => entry.timestamp !== timestamp);
+          await chrome.storage.local.set({ entries: updatedEntries });
+          allEntries = updatedEntries;
+          renderEntries(updatedEntries);
+        }
+      })
+    });
+
   }
 }
 
