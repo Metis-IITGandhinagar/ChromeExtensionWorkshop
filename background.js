@@ -38,11 +38,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 					top: 200,
 				},
 				async window => {
-					// Listen for messages from the popup window.
-					chrome.runtime.onMessage.addListener(function listener(message) {
-						// Check if the message contains the saved data.
+					chrome.runtime.onMessage.addListener(function listener(message, sender, sendResponse) {
+						console.log("Received message:", message);
+						if (message.type === "getCategories") {
+							chrome.storage.local.get({ entries: [] }, data => {
+								const uniqueCategories = new Set(data.entries.map(entry => entry.category));
+								sendResponse({ categories: [...uniqueCategories] });
+							});
+						}
+
 						if (message.type === "saveData" && message.data) {
-							// Create the entry object with the received data and selected text.
 							const entry = {
 								title: message.data.title,
 								text: info.selectionText.trim(),
@@ -51,17 +56,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 								timestamp: Date.now(),
 							};
 
-							// Get existing entries from storage, add the new entry, and update storage.
 							chrome.storage.local.get({ entries: [] }, data => {
 								const entries = [entry, ...data.entries];
 								chrome.storage.local.set({ entries }, () => {
-									// Close the popup window after saving.
 									chrome.windows.remove(window.id);
 								});
 							});
+							chrome.runtime.onMessage.removeListener(listener);
 						}
-						// Remove the listener after receiving the message.
-						chrome.runtime.onMessage.removeListener(listener);
+						return true;
 					});
 				}
 			);

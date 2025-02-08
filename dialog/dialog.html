@@ -25,6 +25,31 @@
       padding: 10px 20px;
       cursor: pointer;
     }
+
+    #category {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      background: white;
+      color: #333;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    #category:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    #new-category {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      width: calc(100% - 22px);
+    }
   </style>
 </head>
 
@@ -35,7 +60,12 @@
   </div>
   <div class="input-group">
     <label>Category:</label>
-    <input type="text" id="category">
+    <select id="category">
+    </select>
+  </div>
+  <div class="input-group">
+    <label>New Category:</label>
+    <input type="text" id="new-category" placeholder="Add new category">
   </div>
   <button id="save">Save</button>
   <script src="dialog.js"></script>
