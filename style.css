@@ -115,6 +115,17 @@ body {
 	transition: opacity 0.2s;
 }
 
+.remove-btn {
+	background: #28a745;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 0.8em;
+	transition: opacity 0.2s;
+}
+
 .summarize-btn:disabled {
 	opacity: 0.7;
 	cursor: not-allowed;

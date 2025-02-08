@@ -63,6 +63,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 									chrome.windows.remove(window.id);
 								});
 							});
+							chrome.runtime.sendResponse({ message: "Data saved successfully" });
 							chrome.runtime.onMessage.removeListener(listener);
 						}
 						return true;
